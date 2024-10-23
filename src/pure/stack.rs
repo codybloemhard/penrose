@@ -736,7 +736,6 @@ mod tests {
         assert_eq!(s, expected);
     }
 
-
     #[test_case(stack!([1, 2], 3, [4, 5, 6]), |&e| e == 3, stack!([1, 2], 3, [4, 5, 6]); "current focus")]
     #[test_case(stack!([1, 2], 3, [4, 5, 6]), |&e| e > 4, stack!([1, 2, 3, 4], 5, [6]); "in tail")]
     #[test_case(stack!([1, 2], 3, [4, 5, 6]), |&e| e < 3 && e > 1, stack!([1], 2, [3, 4, 5, 6]); "in head")]
