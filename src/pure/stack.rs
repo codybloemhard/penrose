@@ -235,8 +235,25 @@ impl<T> Stack<T> {
         swap(&mut head, &mut self.focus);
         self.down.push_front(head);
 
-        for item in take(&mut self.up).into_iter().rev() {
+        for item in take(&mut self.up).into_iter() {
             self.down.push_front(item);
+        }
+
+        self
+    }
+
+    /// Move focus to the element in the head position
+    pub fn focus_tail(&mut self) -> &mut Self {
+        let mut tail = match self.down.pop_back() {
+            None => return self, // focus is already tail
+            Some(t) => t,
+        };
+
+        swap(&mut tail, &mut self.focus);
+        self.up.push_front(tail);
+
+        for item in take(&mut self.down).into_iter() {
+            self.up.push_front(item);
         }
 
         self
@@ -697,9 +714,9 @@ mod tests {
         assert_eq!(s, expected);
     }
 
-    #[test_case(stack!([1, 2], 3, [4, 5]), stack!(1, [2, 3, 4, 5]); "items up and down")]
-    #[test_case(stack!([1, 2], 3), stack!(1, [2, 3]); "items up")]
-    #[test_case(stack!(3, [4, 5]), stack!(3, [4, 5]); "items down")]
+    #[test_case(stack!([1, 2, 3], 4, [5, 6, 7]), stack!(1, [2, 3, 4, 5, 6, 7]); "items up and down")]
+    #[test_case(stack!([1, 2, 3], 4), stack!(1, [2, 3, 4]); "items up")]
+    #[test_case(stack!(3, [4, 5, 6]), stack!(3, [4, 5, 6]); "items down")]
     #[test_case(stack!(3), stack!(3); "focus only")]
     #[test]
     fn focus_head(mut s: Stack<u8>, expected: Stack<u8>) {
@@ -707,6 +724,18 @@ mod tests {
 
         assert_eq!(s, expected);
     }
+
+    #[test_case(stack!([1, 2, 3], 4, [5, 6, 7]), stack!([1, 2, 3, 4, 5, 6], 7); "items up and down")]
+    #[test_case(stack!([1, 2, 3], 4), stack!([1, 2, 3], 4); "items up")]
+    #[test_case(stack!(3, [4, 5, 6]), stack!([3, 4, 5], 6); "items down")]
+    #[test_case(stack!(3), stack!(3); "focus only")]
+    #[test]
+    fn focus_tail(mut s: Stack<u8>, expected: Stack<u8>) {
+        s.focus_tail();
+
+        assert_eq!(s, expected);
+    }
+
 
     #[test_case(stack!([1, 2], 3, [4, 5, 6]), |&e| e == 3, stack!([1, 2], 3, [4, 5, 6]); "current focus")]
     #[test_case(stack!([1, 2], 3, [4, 5, 6]), |&e| e > 4, stack!([1, 2, 3, 4], 5, [6]); "in tail")]
