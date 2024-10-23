@@ -995,6 +995,22 @@ mod quickcheck_tests {
         }
     }
 
+    #[quickcheck]
+    fn focus_head_preserves_order(mut stack: Stack<u8>) -> bool {
+        let original = stack.clone().flatten();
+        stack.focus_head();
+
+        stack.flatten() == original
+    }
+
+    #[quickcheck]
+    fn focus_tail_preserves_order(mut stack: Stack<u8>) -> bool {
+        let original = stack.clone().flatten();
+        stack.focus_tail();
+
+        stack.flatten() == original
+    }
+
     // Define a composition law for operations on a Stack.
     // Using these as the real implementation is not particularly efficient but the laws should
     // hold for the hand written impls as well.
