@@ -142,7 +142,14 @@ impl ClickData {
         (f)(&mut r, dx, dy);
 
         state.client_set.float(id, r)?;
-        x.position_client(id, r)?;
+
+        // When we position the window we need to shrink in so that we match
+        // the behaviour of ../../x/mod.rs:/fn\sposition_clients/
+        // -> without this we end up with the window size shrinking when the
+        //    mouse button is released and the default position_clients logic
+        //    runs using the Rect that we store above.
+        let border = state.config.border_width;
+        x.position_client(id, r.shrink_in(border))?;
 
         Ok(())
     }
